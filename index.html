@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Transport Framework 3D</title>
+<style>
+:root{--bg:#f5f6f8;--fg:#14181f;--card:#fff;--mut:#6b7280;--ac:#2563eb;--bd:#d9dde3;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1117;--fg:#e6e9ef;--card:#171b24;--mut:#8b93a3;--ac:#5b9bff;--bd:#2a3040;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1117;--fg:#e6e9ef;--card:#171b24;--mut:#8b93a3;--ac:#5b9bff;--bd:#2a3040;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:12px}
+h1{font-size:18px;margin:4px 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+canvas{width:100%;height:380px;display:block;border-radius:8px;touch-action:none;background:var(--bg)}
+small,.mut{color:var(--mut)}
+.hier{margin-top:10px;font-size:14px;line-height:1.5}
+.hier details{margin:2px 0 2px 12px}
+.hier summary{cursor:pointer;font-weight:500}
+.hier .loc{margin-left:16px;font-size:13px;color:var(--mut)}
+.icons{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.icon{display:flex;align-items:center;gap:4px;font-size:13px}
+.icon img{width:26px;height:26px;object-fit:cover;border-radius:4px;border:1px solid var(--bd)}
+.lane-form{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;align-items:center}
+.lane-form select,button,input{font:inherit;padding:4px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--fg)}
+.lane-list{margin-top:6px;font-size:14px}
+</style></head><body><main>
+<h1>Transport Framework 3D</h1>
+<div class="card">
+<canvas id="cv"></canvas>
+<div class="mut" id="hint" style="margin-top:6px">Drag to orbit, pinch or scroll to zoom. Tap a system to inspect.</div>
+<div id="sel" class="hier"></div>
+<div id="catalog" class="icons"></div>
+<div id="lanes" style="margin-top:12px"></div>
+</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ========== EDIT MAP DATA HERE ========== */
+// o values: "equatorial" | "circular" | "polar" | "inclined" | null
+const CFG={
+  labels:{system:"System",gate:"Gate",vehicle:"Vehicle",unit:"Unit",liquid:"Liquid",station:"Station",location:"Location"},
+  factions:{terran:{name:"Terran Union",color:"#4da3ff"},traders:{name:"Free Traders",color:"#ffb84d"},none:{name:"Unclaimed",color:"#9aa3b2"}},
+  mapImage:null
+};
+const U={
+  systems:[
+    {
+      id:"s1",name:"Sol",x:0,y:0,z:0,f:"terran",icon:null,
+      bodies:[
+        {id:"sun",type:"star",name:"Sun",o:null,resources:["energy"],fuel:"fusion",icon:null,
+          stations:[{id:"solsta",name:"Sol Station",o:"equatorial",resources:["fuel"],icon:null}]},
+        {id:"earth",type:"planet",name:"Earth",parent:"sun",o:"circular",resources:["water","food"],fuel:"antimatter",icon:null,
+          locations:[{id:"ny",name:"New York",x:40,y:-74,type:"dayside"},{id:"base",name:"Polar Outpost",x:90,y:0,type:"polar"}],
+          stations:[{id:"iss",name:"Orbital Hub",o:"equatorial",resources:["cargo"],icon:null}]},
+        {id:"luna",type:"moon",name:"Luna",parent:"earth",o:"circular",resources:["metals"],icon:null,
+          stations:[{id:"lunasta",name:"Luna Base",o:"polar",resources:["ore"],icon:null}]}
+      ]
+    },
+    {id:"s2",name:"Vega",x:25,y:-10,z:8,f:"terran",icon:null,bodies:[{id:"vega",type:"star",name:"Vega",o:null,resources:["rare"],fuel:"antimatter"}]},
+    {id:"s3",name:"Altair",x:-20,y:18,z:-6,f:"traders",icon:null,bodies:[]},
+    {id:"s4",name:"Rigel",x:10,y:30,z:14,f:"traders",icon:null,bodies:[]},
+    {id:"s5",name:"Deneb",x:-30,y:-22,z:10,f:"none",icon:null,bodies:[]},
+    {id:"s6",name:"Kepler",x:38,y:18,z:-8,f:"none",icon:null,bodies:[]}
+  ],
+  gates:[["s1","s2",4],["s1","s3",6],["s2","s6",3],["s3","s4",5],["s1","s5",7],["s4","s6",4]], // [from,to,time]
+  catalog:[
+    {type:"vehicle",name:"Freighter",icon:null},
+    {type:"unit",name:"Cargo Pod",icon:null},
+    {type:"liquid",name:"Antimatter",icon:null}
+  ],
+  pilots:[{id:"p1",name:"Ace"},{id:"p2",name:"Nova"}],
+  vehicles:[{id:"v1",name:"Freighter A",type:"vehicle"},{id:"v2",name:"Tanker B",type:"vehicle"}],
+  lanes:[], // {from,to,resource,pilots:[],vehicles:[]}
+  deals:[]  // {from,to,resource,years,price,qty} — fixed-price future contracts
+};
+/* ======================================== */
+const $=s=>document.querySelector(s),css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),fcol=f=>(CFG.factions[f]||CFG.factions.none).color;
+const cv=$("#cv"),R=new THREE.WebGLRenderer({canvas:cv});R.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,1,.1,1000),grp=new THREE.Group(),O={th:.8,ph:1,r:85};
+sc.add(grp);const grid=new THREE.GridHelper(100,20);sc.add(grid);
+const mp=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
+mp.rotation.x=-Math.PI/2;mp.position.y=-.05;sc.add(mp);
+if(CFG.mapImage)new THREE.TextureLoader().load(CFG.mapImage,t=>{mp.material.map=t;mp.material.opacity=.75;mp.material.needsUpdate=true;dirty=1});
+function setCam(){cam.position.set(O.r*Math.sin(O.ph)*Math.cos(O.th),O.r*Math.cos(O.ph),O.r*Math.sin(O.ph)*Math.sin(O.th));cam.lookAt(0,0,0);dirty=1}
+function resize(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=1}
+function label(t,col){const c=document.createElement("canvas");c.width=256;c.height=64;const x=c.getContext("2d");x.font="bold 30px system-ui";x.textAlign="center";x.fillStyle=col;x.fillText(t,128,42);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(12,3,1);s.position.y=3;return s}
+function iconSprite(url,pos){const s=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthTest:false}));s.scale.set(4,4,1);s.position.copy(pos).add(new THREE.Vector3(0,5,0));
+  new THREE.TextureLoader().load(url,t=>{s.material.map=t;s.material.needsUpdate=true;dirty=1});return s}
+let selId=null,dirty=1;
+function rebuild(){
+  grp.children.slice().forEach(o=>{grp.remove(o);o.geometry&&o.geometry.dispose();o.material&&(o.material.map&&o.material.map.dispose(),o.material.dispose())});
+  const fg=css("--fg"),mut=css("--mut"),ac=css("--ac");R.setClearColor(css("--bg"));
+  grid.material.color.set(mut);grid.material.opacity=.35;grid.material.transparent=true;
+  const P=s=>new THREE.Vector3(s.x,s.z,s.y),by=id=>U.systems.find(s=>s.id==id),gp=[],dp=[];
+  U.systems.forEach(s=>{
+    const m=new THREE.Mesh(new THREE.SphereGeometry(1.6,14,10),new THREE.MeshBasicMaterial({color:fcol(s.f)}));m.position.copy(P(s));m.userData.id=s.id;grp.add(m);
+    const l=label(s.name,fg);l.position.add(P(s));grp.add(l);
+    if(s.icon)grp.add(iconSprite(s.icon,P(s)));
+    if(s.id==selId){const r=new THREE.Mesh(new THREE.SphereGeometry(2.3,12,8),new THREE.MeshBasicMaterial({color:ac,wireframe:true}));r.position.copy(P(s));grp.add(r)}
+    const p=P(s);dp.push(p.x,p.y,p.z,p.x,0,p.z)});
+  U.gates.forEach(g=>{const a=by(g[0]),b=by(g[1]);if(a&&b){const p=P(a),q=P(b);gp.push(p.x,p.y,p.z,q.x,q.y,q.z)}});
+  const ls=(arr,col,op)=>{const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(arr,3));grp.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op})))};
+  ls(dp,mut,.35);ls(gp,ac,1);dirty=1;ui();
+}
+const ptr=new Map();let down=null,pd=0;
+const pinch=()=>{const a=[...ptr.values()];return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])};
+cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);down={x:e.clientX,y:e.clientY,t:Date.now(),n:ptr.size};if(ptr.size==2)pd=pinch()});
+cv.addEventListener("pointermove",e=>{const p=ptr.get(e.pointerId);if(!p)return;
+  if(ptr.size==1){O.th-=(e.clientX-p[0])*.01;O.ph=Math.min(3,Math.max(.1,O.ph-(e.clientY-p[1])*.01))}
+  ptr.set(e.pointerId,[e.clientX,e.clientY]);
+  if(ptr.size==2){const d=pinch();O.r=Math.min(250,Math.max(15,O.r*pd/d));pd=d}setCam()});
+cv.addEventListener("pointerup",e=>{if(ptr.size==1&&down&&down.n==1&&Date.now()-down.t<400&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<8)tap(e);ptr.delete(e.pointerId)});
+cv.addEventListener("pointercancel",e=>ptr.delete(e.pointerId));
+cv.addEventListener("wheel",e=>{e.preventDefault();O.r=Math.min(250,Math.max(15,O.r*(1+e.deltaY*.001)));setCam()},{passive:false});
+const ray=new THREE.Raycaster();
+function tap(e){const r=cv.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),cam);
+  const h=ray.intersectObjects(grp.children.filter(o=>o.userData.id));
+  selId=h.length?h[0].object.userData.id:null;rebuild()}
+function bodyHtml(b){
+  const icon=b.icon?`<img src="${b.icon}" style="width:18px;height:18px;vertical-align:middle;border-radius:3px;margin-right:4px">`:"";
+  const res=(b.resources||[]).join(", ")||"—";
+  const st=(b.stations||[]).map(s=>{
+    const si=s.icon?`<img src="${s.icon}" style="width:16px;height:16px;vertical-align:middle;border-radius:3px;margin-right:3px">`:"";
+    return `<div>${si}${s.name} <small>(o: ${s.o||"none"}, res: ${(s.resources||[]).join(", ")||"—"}${s.fuel?", fuel: "+s.fuel:""})</small></div>`;
+  }).join("");
+  const locs=(b.locations||[]).map(l=>`<div class="loc">${l.name} @ (${l.x},${l.y}) <small>type: ${l.type||"—"}</small></div>`).join("");
+  return `<details open><summary>${icon}${b.name} <small>(${b.type}${b.o?", o: "+b.o:""}, res: ${res}${b.fuel?", fuel: "+b.fuel:""})</small></summary>${st}${locs}</details>`;
+}
+function ui(){const s=U.systems.find(x=>x.id==selId),L=CFG.labels;
+  if(s){
+    const bodies=(s.bodies||[]).map(bodyHtml).join("");
+    const gtimes=U.gates.filter(g=>g.includes(s.id)).map(g=>{const other=g[0]==s.id?g[1]:g[0];const os=U.systems.find(x=>x.id==other);return os?`${os.name} (${g[2]||"?"}t)`:"";}).filter(Boolean).join(", ");
+    $("#sel").innerHTML=`<b>${s.name}</b> · ${CFG.factions[s.f]?.name||s.f}<br><small>pos ${s.x}, ${s.y}, ${s.z} · gates: ${gtimes||"none"}</small>${s.icon?`<br><img src="${s.icon}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin:4px 0">`:""}<div>${bodies||"<small>No bodies defined</small>"}</div>`;
+  }else $("#sel").innerHTML=`<span class="mut">${U.systems.length} ${L.system}s, ${U.gates.length} ${L.gate}s</span>`;
+  $("#catalog").innerHTML=U.catalog.filter(i=>i.icon).map(i=>`<div class="icon"><img src="${i.icon}" alt="">${i.name} <small>(${i.type})</small></div>`).join("");
+  renderOps();
+}
+function renderOps(){
+  const sysOpts=U.systems.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+  const pOpts=U.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
+  const vOpts=U.vehicles.map(v=>`<option value="${v.id}">${v.name}</option>`).join("");
+  const resSet=new Set();
+  U.systems.forEach(sy=>(sy.bodies||[]).forEach(b=>{ (b.resources||[]).forEach(r=>resSet.add(r)); (b.stations||[]).forEach(st=>(st.resources||[]).forEach(r=>resSet.add(r))); }));
+  const rOpts=[...resSet].map(r=>`<option>${r}</option>`).join("")||`<option>antimatter</option>`;
+  $("#lanes").innerHTML=`<b>Lanes & Deals</b>
+  <div class="lane-form">
+    <small>Lane:</small>
+    <select id="lf">${sysOpts}</select> → <select id="lt">${sysOpts}</select>
+    <select id="lr">${rOpts}</select>
+    <select id="lp" multiple size="2">${pOpts}</select>
+    <select id="lv" multiple size="2">${vOpts}</select>
+    <button id="la">Assign lane</button>
+  </div>
+  <div class="lane-form">
+    <small>Future deal:</small>
+    <select id="df">${sysOpts}</select> → <select id="dt">${sysOpts}</select>
+    <select id="dr">${rOpts}</select>
+    <input id="dy" type="number" min="1" value="5" placeholder="years" style="width:60px">
+    <input id="dp" type="number" min="0" value="100" placeholder="price" style="width:70px">
+    <input id="dq" type="number" min="1" value="10" placeholder="qty/yr" style="width:70px">
+    <button id="da">Strike deal</button>
+    <button id="lb">Best deals</button>
+  </div>
+  <div class="lane-list" id="ll">
+    <b>Lanes</b><br>${U.lanes.map((l,i)=>`${l.from} → ${l.to} · ${l.resource} · pilots: ${l.pilots.join(",")} · vehicles: ${l.vehicles.join(",")} <button data-rm="l${i}">×</button>`).join("<br>")||"<small>No lanes</small>"}
+    <br><br><b>Future deals</b> <small>(fixed price for N years)</small><br>${U.deals.map((d,i)=>`${d.from} → ${d.to} · ${d.resource} · ${d.years}y @ ${d.price} · ${d.qty}/yr <button data-rm="d${i}">×</button>`).join("<br>")||"<small>No deals</small>"}
+  </div>`;
+  $("#la").onclick=()=>{
+    const from=$("#lf").value,to=$("#lt").value,resource=$("#lr").value;
+    const pilots=[...$("#lp").selectedOptions].map(o=>o.value),vehicles=[...$("#lv").selectedOptions].map(o=>o.value);
+    if(from&&to&&from!=to&&resource&&(pilots.length||vehicles.length)){U.lanes.push({from,to,resource,pilots,vehicles});renderOps();}
+  };
+  $("#da").onclick=()=>{
+    const from=$("#df").value,to=$("#dt").value,resource=$("#dr").value,years=+$("#dy").value||1,price=+$("#dp").value||0,qty=+$("#dq").value||1;
+    if(from&&to&&from!=to&&resource&&years>0){U.deals.push({from,to,resource,years,price,qty});renderOps();}
+  };
+  $("#lb").onclick=()=>{
+    const deals=[];
+    const resMap={};
+    U.systems.forEach(sy=>(sy.bodies||[]).forEach(b=>{
+      (b.resources||[]).forEach(r=>{if(!resMap[r])resMap[r]=[];resMap[r].push(sy.id);});
+      (b.stations||[]).forEach(st=>(st.resources||[]).forEach(r=>{if(!resMap[r])resMap[r]=[];resMap[r].push(sy.id);}));
+    }));
+    Object.entries(resMap).forEach(([r,ids])=>{if(ids.length>1)deals.push(`${r}: ${[...new Set(ids)].join(" ↔ ")}`);});
+    alert(deals.length?deals.join("\n"):"No multi-system resources found.");
+  };
+  document.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.rm[0],i=+b.dataset.rm.slice(1);
+    if(k=="l")U.lanes.splice(i,1);else U.deals.splice(i,1);
+    renderOps();
+  });
+}
+addEventListener("resize",resize);
+(function loop(){if(dirty){R.render(sc,cam);dirty=0}requestAnimationFrame(loop)})();
+resize();setCam();rebuild();
+</script></body></html>
