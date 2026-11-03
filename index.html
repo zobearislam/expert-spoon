@@ -3,29 +3,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Transport Framework</title>
 <style>
-:root{--bg:#f5f6f8;--fg:#14181f;--card:#fff;--mut:#6b7280;--ac:#2563eb;--bd:#d9dde3;--ok:#16a34a;color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1117;--fg:#e6e9ef;--card:#171b24;--mut:#8b93a3;--ac:#5b9bff;--bd:#2a3040;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1117;--fg:#e6e9ef;--card:#171b24;--mut:#8b93a3;--ac:#5b9bff;--bd:#2a3040;color-scheme:dark}
+:root{--bg:#f4f6f9;--fg:#1a1d24;--card:#ffffff;--mut:#6b7280;--ac:#3b82f6;--ac-hover:#2563eb;--bd:#e5e7eb;--ok:#10b981;--danger:#ef4444;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;--bd:#2d3340;--ok:#34d399;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;--bd:#2d3340;--ok:#34d399;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif}
-nav{display:flex;gap:4px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10;flex-wrap:wrap}
-nav button{padding:8px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer;font:inherit}
-nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-main{max-width:900px;margin:0 auto;padding:12px}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,sans-serif}
+nav{display:flex;gap:6px;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:20;flex-wrap:wrap;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+nav button{padding:8px 16px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--fg);cursor:pointer;font:inherit;font-weight:500;transition:all .15s}
+nav button:hover{background:rgba(59,130,246,.08)}
+nav button.on{background:var(--ac);color:#fff}
+main{max-width:920px;margin:0 auto;padding:16px}
 .screen{display:none}.screen.on{display:block}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
-h1{font-size:20px;margin:0 0 12px}
-h2{font-size:16px;margin:0 0 10px}
-canvas{width:100%;height:420px;display:block;border-radius:10px;touch-action:none;background:var(--bg)}
-small,.mut{color:var(--mut)}
-.hier details{margin:4px 0 4px 10px}
-.hier summary{cursor:pointer;font-weight:500}
-.form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
-.form input,.form select,button{font:inherit;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+h1{font-size:22px;margin:0 0 14px;font-weight:600}
+h2{font-size:17px;margin:0 0 12px;font-weight:600}
+canvas{width:100%;height:440px;display:block;border-radius:12px;touch-action:none;background:var(--bg);border:1px solid var(--bd)}
+small,.mut{color:var(--mut);font-size:13.5px}
+.hier{margin-top:12px}
+.hier details{margin:6px 0 6px 8px}
+.hier summary{cursor:pointer;font-weight:500;padding:4px 0}
+.form{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.form input,.form select,button{font:inherit;padding:8px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);transition:border .15s}
+.form input:focus,.form select:focus{outline:none;border-color:var(--ac)}
+button{cursor:pointer;font-weight:500}
 button.primary{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.primary:hover{background:var(--ac-hover)}
 button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
-.list-item{padding:8px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
-.credits{font-weight:600;color:var(--ac)}
+button.danger{background:transparent;color:var(--danger);border-color:var(--danger);padding:4px 10px;font-size:13px}
+.list-item{padding:10px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.list-item:last-child{border-bottom:none}
+.credits{font-weight:600;color:var(--ac);background:rgba(59,130,246,.1);padding:6px 12px;border-radius:20px;font-size:14px}
+.empty{color:var(--mut);padding:12px 0;font-style:italic}
 </style></head><body>
 <nav>
   <button data-s="map" class="on">Map</button>
@@ -40,15 +48,15 @@ button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
     <div class="card">
       <h1>Star Map</h1>
       <canvas id="cv"></canvas>
-      <div class="mut" style="margin-top:8px">Drag to orbit · pinch/scroll to zoom · tap a system</div>
-      <div id="sel" class="hier" style="margin-top:10px"></div>
+      <div class="mut" style="margin-top:10px">Drag to orbit · pinch or scroll to zoom · tap a system to inspect</div>
+      <div id="sel" class="hier"></div>
     </div>
   </div>
   <div id="pilots" class="screen">
     <div class="card">
       <h2>Hire Pilots</h2>
       <div class="form">
-        <input id="pname" placeholder="Pilot name" style="flex:1">
+        <input id="pname" placeholder="Enter pilot name" style="flex:1;min-width:160px">
         <button class="primary" id="hire">Hire (500 cr)</button>
       </div>
       <div id="plist"></div>
@@ -56,9 +64,9 @@ button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
   </div>
   <div id="vehicles" class="screen">
     <div class="card">
-      <h2>Buy Vehicles</h2>
+      <h2>Available Vehicles</h2>
       <div id="vtypes"></div>
-      <h2 style="margin-top:16px">Your Fleet</h2>
+      <h2 style="margin-top:20px">Your Fleet</h2>
       <div id="vlist"></div>
     </div>
   </div>
@@ -66,14 +74,14 @@ button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
     <div class="card">
       <h2>Assign Lanes</h2>
       <div id="laneform"></div>
-      <div id="lanelist"></div>
+      <div id="lanelist" style="margin-top:12px"></div>
     </div>
   </div>
   <div id="deals" class="screen">
     <div class="card">
       <h2>Future Deals</h2>
       <div id="dealform"></div>
-      <div id="deallist"></div>
+      <div id="deallist" style="margin-top:12px"></div>
     </div>
   </div>
 </main>
@@ -81,7 +89,7 @@ button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
 <script>
 /* ========== EDIT MAP DATA HERE ========== */
 // o: "equatorial"|"circular"|"polar"|"inclined"|null
-// Vehicle types: add more objects here (capacity, speed, cost, fuel)
+// Add more vehicle types below (capacity, speed, cost, fuel)
 const CFG={
   labels:{system:"System",gate:"Gate"},
   factions:{terran:{name:"Terran Union",color:"#4da3ff"},traders:{name:"Free Traders",color:"#ffb84d"},none:{name:"Unclaimed",color:"#9aa3b2"}},
@@ -117,7 +125,7 @@ const U={
 /* ======================================== */
 const $=s=>document.querySelector(s),css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),fcol=f=>(CFG.factions[f]||CFG.factions.none).color;
 let screen="map",selId=null,dirty=1;
-const cv=$("#cv"),R=new THREE.WebGLRenderer({canvas:cv});R.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const cv=$("#cv"),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));
 const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,1,.1,1000),grp=new THREE.Group(),O={th:.8,ph:1,r:85};
 sc.add(grp);const grid=new THREE.GridHelper(100,20);sc.add(grid);
 const mp=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
@@ -157,8 +165,8 @@ function tap(e){const r=cv.getBoundingClientRect();ray.setFromCamera(new THREE.V
   selId=h.length?h[0].object.userData.id:null;rebuild()}
 function bodyHtml(b){
   const res=(b.resources||[]).join(", ")||"—";
-  const st=(b.stations||[]).map(s=>`<div>${s.name} <small>(o: ${s.o||"none"}, res: ${(s.resources||[]).join(", ")||"—"}${s.fuel?", fuel: "+s.fuel:""})</small></div>`).join("");
-  const locs=(b.locations||[]).map(l=>`<div class="loc">${l.name} @ (${l.x},${l.y}) <small>type: ${l.type||"—"}</small></div>`).join("");
+  const st=(b.stations||[]).map(s=>`<div style="margin:4px 0 4px 12px">${s.name} <small>(o: ${s.o||"none"}, res: ${(s.resources||[]).join(", ")||"—"}${s.fuel?", fuel: "+s.fuel:""})</small></div>`).join("");
+  const locs=(b.locations||[]).map(l=>`<div style="margin:2px 0 2px 20px;font-size:13.5px" class="mut">${l.name} @ (${l.x},${l.y}) <small>type: ${l.type||"—"}</small></div>`).join("");
   return `<details open><summary>${b.name} <small>(${b.type}${b.o?", o: "+b.o:""}, res: ${res}${b.fuel?", fuel: "+b.fuel:""})</small></summary>${st}${locs}</details>`;
 }
 function renderUI(){
@@ -167,32 +175,27 @@ function renderUI(){
   if(s){
     const bodies=(s.bodies||[]).map(bodyHtml).join("");
     const gtimes=U.gates.filter(g=>g.includes(s.id)).map(g=>{const o=g[0]==s.id?g[1]:g[0];const os=U.systems.find(x=>x.id==o);return os?`${os.name} (${g[2]}t)`:"";}).filter(Boolean).join(", ");
-    $("#sel").innerHTML=`<b>${s.name}</b> · ${CFG.factions[s.f]?.name||s.f}<br><small>pos ${s.x}, ${s.y}, ${s.z} · gates: ${gtimes||"none"}</small><div>${bodies||"<small>No bodies</small>"}</div>`;
-  }else $("#sel").innerHTML=`<span class="mut">${U.systems.length} systems, ${U.gates.length} gates</span>`;
-  // pilots
-  $("#plist").innerHTML=U.pilots.map((p,i)=>`<div class="list-item">${p.name} <button data-rmp="${i}">Fire</button></div>`).join("")||"<small>No pilots hired</small>";
-  // vehicles
-  $("#vtypes").innerHTML=CFG.vehicleTypes.map(t=>`<div class="list-item">${t.name} <small>cap ${t.capacity} · spd ${t.speed} · ${t.fuel}</small> <button class="ok" data-buy="${t.id}">Buy ${t.cost} cr</button></div>`).join("");
-  $("#vlist").innerHTML=U.vehicles.map((v,i)=>`<div class="list-item">${v.name} (${v.type}) <button data-rmv="${i}">Sell</button></div>`).join("")||"<small>No vehicles owned</small>";
-  // lanes
+    $("#sel").innerHTML=`<b>${s.name}</b> · ${CFG.factions[s.f]?.name||s.f}<br><small>pos ${s.x}, ${s.y}, ${s.z} · gates: ${gtimes||"none"}</small><div style="margin-top:8px">${bodies||"<div class='empty'>No bodies defined</div>"}</div>`;
+  }else $("#sel").innerHTML=`<div class="empty">${U.systems.length} systems · ${U.gates.length} gates</div>`;
+  $("#plist").innerHTML=U.pilots.map((p,i)=>`<div class="list-item"><span>${p.name}</span><button class="danger" data-rmp="${i}">Fire</button></div>`).join("")||`<div class="empty">No pilots hired yet</div>`;
+  $("#vtypes").innerHTML=CFG.vehicleTypes.map(t=>`<div class="list-item"><div><b>${t.name}</b><br><small>cap ${t.capacity} · spd ${t.speed} · ${t.fuel}</small></div><button class="ok" data-buy="${t.id}">Buy ${t.cost} cr</button></div>`).join("");
+  $("#vlist").innerHTML=U.vehicles.map((v,i)=>`<div class="list-item"><span>${v.name} <small>(${v.type})</small></span><button class="danger" data-rmv="${i}">Sell</button></div>`).join("")||`<div class="empty">No vehicles in fleet</div>`;
   const sysOpts=U.systems.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
   const pOpts=U.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
   const vOpts=U.vehicles.map(v=>`<option value="${v.id}">${v.name}</option>`).join("");
   const resSet=new Set();U.systems.forEach(sy=>(sy.bodies||[]).forEach(b=>{(b.resources||[]).forEach(r=>resSet.add(r));(b.stations||[]).forEach(st=>(st.resources||[]).forEach(r=>resSet.add(r)))}));
   const rOpts=[...resSet].map(r=>`<option>${r}</option>`).join("")||`<option>antimatter</option>`;
-  $("#laneform").innerHTML=`<div class="form"><select id="lf">${sysOpts}</select>→<select id="lt">${sysOpts}</select><select id="lr">${rOpts}</select><select id="lp" multiple size="2">${pOpts}</select><select id="lv" multiple size="2">${vOpts}</select><button class="primary" id="la">Assign</button></div>`;
-  $("#lanelist").innerHTML=U.lanes.map((l,i)=>`<div class="list-item">${name(l.from)} → ${name(l.to)} · ${l.resource} · ${l.pilots.length}p/${l.vehicles.length}v <button data-rml="${i}">×</button></div>`).join("")||"<small>No lanes</small>";
-  // deals
-  $("#dealform").innerHTML=`<div class="form"><select id="df">${sysOpts}</select>→<select id="dt">${sysOpts}</select><select id="dr">${rOpts}</select><input id="dy" type="number" min="1" value="5" style="width:60px" placeholder="years"><input id="dp" type="number" min="0" value="100" style="width:70px" placeholder="price"><input id="dq" type="number" min="1" value="10" style="width:70px" placeholder="qty"><button class="primary" id="da">Strike</button></div>`;
-  $("#deallist").innerHTML=U.deals.map((d,i)=>`<div class="list-item">${name(d.from)} → ${name(d.to)} · ${d.resource} · ${d.years}y @ ${d.price} · ${d.qty}/yr <button data-rmd="${i}">×</button></div>`).join("")||"<small>No deals</small>";
-  // events
+  $("#laneform").innerHTML=`<div class="form"><select id="lf">${sysOpts}</select><span>→</span><select id="lt">${sysOpts}</select><select id="lr">${rOpts}</select><select id="lp" multiple size="3">${pOpts}</select><select id="lv" multiple size="3">${vOpts}</select><button class="primary" id="la">Assign Lane</button></div>`;
+  $("#lanelist").innerHTML=U.lanes.map((l,i)=>`<div class="list-item"><span>${name(l.from)} → ${name(l.to)} · ${l.resource} · ${l.pilots.length} pilot(s) / ${l.vehicles.length} vehicle(s)</span><button class="danger" data-rml="${i}">Remove</button></div>`).join("")||`<div class="empty">No lanes assigned</div>`;
+  $("#dealform").innerHTML=`<div class="form"><select id="df">${sysOpts}</select><span>→</span><select id="dt">${sysOpts}</select><select id="dr">${rOpts}</select><input id="dy" type="number" min="1" value="5" style="width:70px" placeholder="years"><input id="dp" type="number" min="0" value="100" style="width:80px" placeholder="price"><input id="dq" type="number" min="1" value="10" style="width:70px" placeholder="qty"><button class="primary" id="da">Strike Deal</button></div>`;
+  $("#deallist").innerHTML=U.deals.map((d,i)=>`<div class="list-item"><span>${name(d.from)} → ${name(d.to)} · ${d.resource} · ${d.years} years @ ${d.price} · ${d.qty}/yr</span><button class="danger" data-rmd="${i}">Remove</button></div>`).join("")||`<div class="empty">No future deals</div>`;
   document.querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{U.pilots.splice(+b.dataset.rmp,1);renderUI()});
   document.querySelectorAll("[data-rmv]").forEach(b=>b.onclick=()=>{U.vehicles.splice(+b.dataset.rmv,1);renderUI()});
   document.querySelectorAll("[data-rml]").forEach(b=>b.onclick=()=>{U.lanes.splice(+b.dataset.rml,1);renderUI()});
   document.querySelectorAll("[data-rmd]").forEach(b=>b.onclick=()=>{U.deals.splice(+b.dataset.rmd,1);renderUI()});
   document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
     const t=CFG.vehicleTypes.find(x=>x.id==b.dataset.buy);
-    if(t&&U.credits>=t.cost){U.credits-=t.cost;U.vehicles.push({id:"v"+Date.now(),name:t.name+" #"+ (U.vehicles.length+1),type:t.id,...t});renderUI()}
+    if(t&&U.credits>=t.cost){U.credits-=t.cost;U.vehicles.push({id:"v"+Date.now(),name:t.name+" #"+(U.vehicles.length+1),type:t.id,...t});renderUI()}
   });
   $("#hire").onclick=()=>{const n=$("#pname").value.trim();if(n&&U.credits>=500){U.credits-=500;U.pilots.push({id:"p"+Date.now(),name:n});$("#pname").value="";renderUI()}};
   $("#la").onclick=()=>{const from=$("#lf").value,to=$("#lt").value,resource=$("#lr").value,pilots=[...$("#lp").selectedOptions].map(o=>o.value),vehicles=[...$("#lv").selectedOptions].map(o=>o.value);
