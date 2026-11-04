@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -1193,5 +1192,88 @@ if(!from||!to||from===to){
 alert("Choose two different systems.");
 return;
    }
-  
+  if(!resource){
+alert("Choose a resource.");
+return;
+}
+
+if(years===null||price===null||qty===null){
+alert("Enter valid deal values.");
+return;
+}
+
+U.deals.push({
+id:"deal_"+Date.now(),
+from,
+to,
+resource,
+years,
+price,
+qty
+});
+
+renderUI();
+};
+
+   }
+   /* ========================================
+   GAME START
+======================================== */
+
+Economy.start();
+   /* ========================================
+   NAVIGATION
+======================================== */
+
+document.querySelectorAll("nav button").forEach(b=>{
+b.onclick=()=>{
+screen=b.dataset.s;
+
+document.querySelectorAll(".screen")
+.forEach(s=>s.classList.remove("on"));
+
+$("#"+screen).classList.add("on");
+
+document.querySelectorAll("nav button")
+.forEach(x=>x.classList.toggle("on",x===b));
+
+if(screen==="map"){
+resize();
+dirty=1;
+}
+};
+});
+   /* ========================================
+   RESIZE
+======================================== */
+
+window.addEventListener("resize",resize);
+
+/* ========================================
+   RENDER LOOP
+======================================== */
+
+function loop(){
+if(destroyed)return;
+
+if(dirty){
+R.render(sc,cam);
+dirty=0;
+}
+
+requestAnimationFrame(loop);
+}
+   /* ========================================
+   INITIAL DRAW
+======================================== */
+
+resize();
+setCam();
+rebuild();
+loop();
+
+</script>
+</body>
+</html>
+
   
