@@ -207,7 +207,6 @@ function renderUI(){
   $("#da").onclick=()=>{const from=$("#df").value,to=$("#dt").value,resource=$("#dr").value,years=+$("#dy").value||1,price=+$("#dp").value||0,qty=+$("#dq").value||1;
     if(from&&to&&from!=to&&resource&&years>0){U.deals.push({from,to,resource,years,price,qty});renderUI()}};}
 Economy.start();
-}
 function name(id){return U.systems.find(s=>s.id==id)?.name||id}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   screen=b.dataset.s;document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$("#"+screen).classList.add("on");
