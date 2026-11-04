@@ -101,7 +101,10 @@ const CFG={
   ]
 };
 const U={
-  credits:10000,
+  credits:0,
+player:{vehicleId:"player_ship",location:"iss"},
+pilots:[],
+vehicles:[{id:"player_ship",name:"Starter Freighter",type:"freighter",capacity:20,speed:2,cost:0,fuel:"xenon"}],
   systems:[
     {id:"s1",name:"Sol",x:0,y:0,z:0,f:"terran",icon:null,bodies:[
       {id:"sun",type:"star",name:"Sun",o:null,resources:["energy"],fuel:"fusion",stations:[{id:"solsta",name:"Sol Station",o:"equatorial",resources:["fuel"]}]},
@@ -117,8 +120,6 @@ const U={
     {id:"s6",name:"Kepler",x:38,y:18,z:-8,f:"none",bodies:[]}
   ],
   gates:[["s1","s2",4],["s1","s3",6],["s2","s6",3],["s3","s4",5],["s1","s5",7],["s4","s6",4]],
-  pilots:[{id:"p1",name:"Ace"},{id:"p2",name:"Nova"}],
-  vehicles:[],
   lanes:[],
   deals:[]
 };
