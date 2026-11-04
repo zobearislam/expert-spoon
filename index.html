@@ -85,6 +85,7 @@ button.danger{background:transparent;color:var(--danger);border-color:var(--dang
     </div>
   </div>
 </main>
+  <script src="./economy.js"></script>
   <script src="./iag-system.js"></script>
   <script src="./flight-physics.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -124,7 +125,7 @@ const U={
   gates:[["s1","s2",4],["s1","s3",6],["s2","s6",3],["s3","s4",5],["s1","s5",7],["s4","s6",4]],
   lanes:[],
   deals:[]
-};
+};Economy.init(U, CFG);
 /* ======================================== */
 const $=s=>document.querySelector(s),css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),fcol=f=>(CFG.factions[f]||CFG.factions.none).color;
 let screen="map",selId=null,dirty=1;
@@ -204,7 +205,8 @@ function renderUI(){
   $("#la").onclick=()=>{const from=$("#lf").value,to=$("#lt").value,resource=$("#lr").value,pilots=[...$("#lp").selectedOptions].map(o=>o.value),vehicles=[...$("#lv").selectedOptions].map(o=>o.value);
     if(from&&to&&from!=to&&resource&&(pilots.length||vehicles.length)){U.lanes.push({from,to,resource,pilots,vehicles});renderUI()}};
   $("#da").onclick=()=>{const from=$("#df").value,to=$("#dt").value,resource=$("#dr").value,years=+$("#dy").value||1,price=+$("#dp").value||0,qty=+$("#dq").value||1;
-    if(from&&to&&from!=to&&resource&&years>0){U.deals.push({from,to,resource,years,price,qty});renderUI()}};
+    if(from&&to&&from!=to&&resource&&years>0){U.deals.push({from,to,resource,years,price,qty});renderUI()}};}
+Economy.start();
 }
 function name(id){return U.systems.find(s=>s.id==id)?.name||id}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
