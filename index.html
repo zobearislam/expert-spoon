@@ -1092,7 +1092,106 @@ maintenance:0
 renderUI();
 };
 });
-  
+ /* ========================================
+   HIRE PILOT
+======================================== */
 
+$("#hire").onclick=()=>{
+const n=$("#pname").value.trim();
+
+if(!n){
+alert("Enter a pilot name.");
+return;
+}
+
+if(U.pilots.some(p=>
+p.name.toLowerCase()===n.toLowerCase()
+)){
+alert("A pilot with this name already exists.");
+return;
+}
+
+if(U.credits<500){
+alert("Not enough credits.");
+return;
+}
+
+U.credits-=500;
+
+U.pilots.push({
+id:"p"+Date.now()+"_"+Math.random().toString(36).slice(2,7), 
+name:n
+});
+
+$("#pname").value="";
+renderUI();
+};
+   /* ========================================
+   ASSIGN LANE
+======================================== */
+
+$("#la").onclick=()=>{
+const from=$("#lf").value;
+const to=$("#lt").value;
+const resource=$("#lr").value;
+
+const pilots=selectedValues($("#lp"));
+const vehicles=selectedValues($("#lv"));
+
+if(!from||!to||from===to){
+alert("Choose two different systems.");
+return;
+}
+
+if(!resource){
+alert("Choose a resource.");
+return;
+}
+
+if(!pilots.length&&!vehicles.length){
+alert("Assign at least one pilot or vehicle.");
+return;
+}
+
+const validPilots=pilots.every(id=>
+U.pilots.some(p=>p.id===id)
+);
+
+const validVehicles=vehicles.every(id=>
+U.vehicles.some(v=>v.id===id)
+);
+   if(!validPilots||!validVehicles){
+alert("One or more selected assignments are invalid.");
+return;
+}
+
+U.lanes.push({
+id:"lane_"+Date.now(),
+from,
+to,
+resource,
+pilots,
+vehicles
+});
+
+renderUI();
+};
+   /* ========================================
+   STRIKE DEAL
+======================================== */
+
+$("#da").onclick=()=>{
+const from=$("#df").value;
+const to=$("#dt").value;
+const resource=$("#dr").value;
+
+const years=validNumber($("#dy").value,1);
+const price=validNumber($("#dp").value,0);
+const qty=validNumber($("#dq").value,1);
+
+if(!from||!to||from===to){
+alert("Choose two different systems.");
+return;
+   }
   
   
