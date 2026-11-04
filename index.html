@@ -195,7 +195,7 @@ function renderUI(){
   document.querySelectorAll("[data-rmd]").forEach(b=>b.onclick=()=>{U.deals.splice(+b.dataset.rmd,1);renderUI()});
   document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
     const t=CFG.vehicleTypes.find(x=>x.id==b.dataset.buy);
-    if(t&&U.credits>=t.cost){U.credits-=t.cost;U.vehicles.push({id:"v"+Date.now(),name:t.name+" #"+(U.vehicles.length+1),type:t.id,...t});renderUI()}
+    if(t&&U.credits>=t.cost){U.credits-=t.cost;U.vehicles.push({id:"v"+Date.now(),name:t.name+" #"+(U.vehicles.length+1){...t,type:t.id});renderUI()}
   });
   $("#hire").onclick=()=>{const n=$("#pname").value.trim();if(n&&U.credits>=500){U.credits-=500;U.pilots.push({id:"p"+Date.now(),name:n});$("#pname").value="";renderUI()}};
   $("#la").onclick=()=>{const from=$("#lf").value,to=$("#lt").value,resource=$("#lr").value,pilots=[...$("#lp").selectedOptions].map(o=>o.value),vehicles=[...$("#lv").selectedOptions].map(o=>o.value);
