@@ -1,219 +1,1098 @@
+
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Transport Framework</title>
+
 <style>
-:root{--bg:#f4f6f9;--fg:#1a1d24;--card:#ffffff;--mut:#6b7280;--ac:#3b82f6;--ac-hover:#2563eb;--bd:#e5e7eb;--ok:#10b981;--danger:#ef4444;color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;--bd:#2d3340;--ok:#34d399;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;--bd:#2d3340;--ok:#34d399;color-scheme:dark}
+:root{
+--bg:#f4f6f9;--fg:#1a1d24;--card:#fff;
+--mut:#6b7280;--ac:#3b82f6;--ac-hover:#2563eb;
+--bd:#e5e7eb;--ok:#10b981;--danger:#ef4444;
+color-scheme:light
+}
+@media(prefers-color-scheme:dark){
+:root:not([data-theme="light"]){
+--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;
+--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;
+--bd:#2d3340;--ok:#34d399;color-scheme:dark
+}}
+:root[data-theme="dark]{
+--bg:#0f1117;--fg:#e8eaed;--card:#1a1d27;
+--mut:#9ca3af;--ac:#60a5fa;--ac-hover:#3b82f6;
+--bd:#2d3340;--ok:#34d399;color-scheme:dark
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,sans-serif}
-nav{display:flex;gap:6px;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:20;flex-wrap:wrap;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-nav button{padding:8px 16px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--fg);cursor:pointer;font:inherit;font-weight:500;transition:all .15s}
+body{
+margin:0;background:var(--bg);color:var(--fg);
+font:15px/1.5 system-ui,-apple-system,sans-serif
+}
+nav{
+display:flex;gap:6px;padding:10px 16px;
+background:var(--card);border-bottom:1px solid var(--bd);
+position:sticky;top:0;z-index:20;flex-wrap:wrap;
+align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)
+}
+nav button{
+padding:8px 16px;border:1px solid transparent;
+border-radius:10px;background:transparent;
+color:var(--fg);cursor:pointer;font:inherit;
+font-weight:500;transition:all .15s
+}
 nav button:hover{background:rgba(59,130,246,.08)}
 nav button.on{background:var(--ac);color:#fff}
 main{max-width:920px;margin:0 auto;padding:16px}
-.screen{display:none}.screen.on{display:block}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.screen{display:none}
+.screen.on{display:block}
+.card{
+background:var(--card);border:1px solid var(--bd);
+border-radius:16px;padding:18px;margin-bottom:16px;
+box-shadow:0 1px 3px rgba(0,0,0,.04)
+}
 h1{font-size:22px;margin:0 0 14px;font-weight:600}
 h2{font-size:17px;margin:0 0 12px;font-weight:600}
-canvas{width:100%;height:440px;display:block;border-radius:12px;touch-action:none;background:var(--bg);border:1px solid var(--bd)}
+canvas{
+width:100%;height:440px;display:block;
+border-radius:12px;touch-action:none;
+background:var(--bg);border:1px solid var(--bd)
+}
 small,.mut{color:var(--mut);font-size:13.5px}
 .hier{margin-top:12px}
 .hier details{margin:6px 0 6px 8px}
 .hier summary{cursor:pointer;font-weight:500;padding:4px 0}
-.form{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
-.form input,.form select,button{font:inherit;padding:8px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);transition:border .15s}
-.form input:focus,.form select:focus{outline:none;border-color:var(--ac)}
+.form{
+display:flex;flex-wrap:wrap;gap:10px;
+align-items:center;margin:12px 0
+}
+.form input,.form select,button{
+font:inherit;padding:8px 12px;border:1px solid var(--bd);
+border-radius:10px;background:var(--card);
+color:var(--fg);transition:border .15s
+}
+.form input:focus,.form select:focus{
+outline:none;border-color:var(--ac)
+}
 button{cursor:pointer;font-weight:500}
 button.primary{background:var(--ac);color:#fff;border-color:var(--ac)}
 button.primary:hover{background:var(--ac-hover)}
 button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
-button.danger{background:transparent;color:var(--danger);border-color:var(--danger);padding:4px 10px;font-size:13px}
-.list-item{padding:10px 0;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:12px}
+button.danger{
+background:transparent;color:var(--danger);
+border-color:var(--danger);padding:4px 10px;font-size:13px
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.list-item{
+padding:10px 0;border-bottom:1px solid var(--bd);
+display:flex;justify-content:space-between;
+align-items:center;gap:12px
+}
 .list-item:last-child{border-bottom:none}
-.credits{font-weight:600;color:var(--ac);background:rgba(59,130,246,.1);padding:6px 12px;border-radius:20px;font-size:14px}
+.credits{
+font-weight:600;color:var(--ac);
+background:rgba(59,130,246,.1);
+padding:6px 12px;border-radius:20px;font-size:14px
+}
 .empty{color:var(--mut);padding:12px 0;font-style:italic}
-</style></head><body>
+.error{
+padding:16px;margin:16px;border:1px solid var(--danger);
+border-radius:12px;color:var(--danger)
+}
+@media(max-width:600px){
+main{padding:10px}
+.card{padding:14px}
+nav{padding:8px}
+nav button{padding:7px 10px;font-size:13px}
+canvas{height:340px}
+}
+</style>
+</head>
+
+<body>
+
 <nav>
-  <button data-s="map" class="on">Map</button>
-  <button data-s="pilots">Pilots</button>
-  <button data-s="vehicles">Vehicles</button>
-  <button data-s="lanes">Lanes</button>
-  <button data-s="deals">Deals</button>
-  <span style="margin-left:auto" class="credits" id="cred">Credits: 10000</span>
+<button data-s="map" class="on">Map</button>
+<button data-s="pilots">Pilots</button>
+<button data-s="vehicles">Vehicles</button>
+<button data-s="lanes">Lanes</button>
+<button data-s="deals">Deals</button>
+<span style="margin-left:auto" class="credits" id="cred">Credits: 10000</span>
 </nav>
+
 <main>
-  <div id="map" class="screen on">
-    <div class="card">
-      <h1>Star Map</h1>
-      <canvas id="cv"></canvas>
-      <div class="mut" style="margin-top:10px">Drag to orbit · pinch or scroll to zoom · tap a system to inspect</div>
-      <div id="sel" class="hier"></div>
-    </div>
-  </div>
-  <div id="pilots" class="screen">
-    <div class="card">
-      <h2>Hire Pilots</h2>
-      <div class="form">
-        <input id="pname" placeholder="Enter pilot name" style="flex:1;min-width:160px">
-        <button class="primary" id="hire">Hire (500 cr)</button>
-      </div>
-      <div id="plist"></div>
-    </div>
-  </div>
-  <div id="vehicles" class="screen">
-    <div class="card">
-      <h2>Available Vehicles</h2>
-      <div id="vtypes"></div>
-      <h2 style="margin-top:20px">Your Fleet</h2>
-      <div id="vlist"></div>
-    </div>
-  </div>
-  <div id="lanes" class="screen">
-    <div class="card">
-      <h2>Assign Lanes</h2>
-      <div id="laneform"></div>
-      <div id="lanelist" style="margin-top:12px"></div>
-    </div>
-  </div>
-  <div id="deals" class="screen">
-    <div class="card">
-      <h2>Future Deals</h2>
-      <div id="dealform"></div>
-      <div id="deallist" style="margin-top:12px"></div>
-    </div>
-  </div>
+
+<div id="map" class="screen on">
+<div class="card">
+<h1>Star Map</h1>
+<canvas id="cv"></canvas>
+<div class="mut" style="margin-top:10px">
+Drag to orbit · pinch or scroll to zoom · tap a system to inspect
+</div>
+<div id="sel" class="hier"></div>
+</div>
+</div>
+
+<div id="pilots" class="screen">
+<div class="card">
+<h2>Hire Pilots</h2>
+<div class="form">
+<input id="pname" placeholder="Enter pilot name"
+style="flex:1;min-width:160px" maxlength="60">
+<button class="primary" id="hire">Hire (500 cr)</button>
+</div>
+<div id="plist"></div>
+</div>
+</div>
+
+<div id="vehicles" class="screen">
+<div class="card">
+<h2>Available Vehicles</h2>
+<div id="vtypes"></div>
+<h2 style="margin-top:20px">Your Fleet</h2>
+<div id="vlist"></div>
+</div>
+</div>
+
+<div id="lanes" class="screen">
+<div class="card">
+<h2>Assign Lanes</h2>
+<div id="laneform"></div>
+<div id="lanelist" style="margin-top:12px"></div>
+</div>
+</div>
+
+<div id="deals" class="screen">
+<div class="card">
+<h2>Future Deals</h2>
+<div id="dealform"></div>
+<div id="deallist" style="margin-top:12px"></div>
+</div>
+</div>
+
 </main>
-  <script src="./economy.js"></script>
-  <script src="./iag-system.js"></script>
-  <script src="./flight-physics.js"></script>
+
+<script src="./economy.js"></script>
+<script src="./iag-system.js"></script>
+<script src="./flight-physics.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script>
-/* ========== EDIT MAP DATA HERE ========== */
-// o: "equatorial"|"circular"|"polar"|"inclined"|null
-// Vehicle specifications: capacity, mass, engine, power, propellant and efficiency
+"use strict";
+
+/* ========================================
+   CONFIGURATION
+======================================== */
+
 const CFG={
-  labels:{system:"System",gate:"Gate"},
-  factions:{terran:{name:"Terran Union",color:"#4da3ff"},traders:{name:"Free Traders",color:"#ffb84d"},none:{name:"Unclaimed",color:"#9aa3b2"}},
-  mapImage:null,
-  vehicleTypes:[
-    {id:"freighter",name:"Freighter",capacity:100,mass:5000,speed:2,cost:2000,engine:"ion",powerSource:"fusion",propellant:"xenon",propellantCapacity:500,thrust:250,power:800,efficiency:0.8,icon:null},
-    {id:"tanker",name:"Tanker",capacity:80,mass:6500,speed:1.5,cost:2500,engine:"fusion",powerSource:"fusion",propellant:"hydrogen",propellantCapacity:900,thrust:300,power:1000,efficiency:0.7,icon:null},
-    {id:"courier",name:"Courier",capacity:20,mass:1800,speed:4,cost:1200,engine:"ion",powerSource:"fusion",propellant:"xenon",propellantCapacity:250,thrust:120,power:400,efficiency:0.9,icon:null}
-  ]
+labels:{system:"System",gate:"Gate"},
+
+factions:{
+terran:{name:"Terran Union",color:"#4da3ff"},
+traders:{name:"Free Traders",color:"#ffb84d"},
+none:{name:"Unclaimed",color:"#9aa3b2"}
+},
+
+mapImage:null,
+
+vehicleTypes:[
+{
+id:"freighter",name:"Freighter",
+capacity:100,mass:5000,speed:2,cost:2000,
+engine:"ion",powerSource:"fusion",
+propellant:"xenon",propellantCapacity:500,
+thrust:250,power:800,efficiency:0.8,icon:null
+},
+{
+id:"tanker",name:"Tanker",
+capacity:80,mass:6500,speed:1.5,cost:2500,
+engine:"fusion",powerSource:"fusion",
+propellant:"hydrogen",propellantCapacity:900,
+thrust:300,power:1000,efficiency:0.7,icon:null
+},
+{
+id:"courier",name:"Courier",
+capacity:20,mass:1800,speed:4,cost:1200,
+engine:"ion",powerSource:"fusion",
+propellant:"xenon",propellantCapacity:250,
+thrust:120,power:400,efficiency:0.9,icon:null
+}
+]
 };
+
+/* ========================================
+   GAME STATE
+======================================== */
+
 const U={
-  credits:10000,
-  player:{vehicleId:"player_ship",location:"iss"},
-  pilots:[],
-  vehicles:[{id:"player_ship",name:"Starter Freighter",type:"freighter",capacity:20,mass:5000,speed:2,cost:0,engine:"ion",powerSource:"fusion",propellant:"xenon",propellantCapacity:500,propellantRemaining:500,thrust:250,power:800,efficiency:0.8,condition:100,maintenance:0}],
-  systems:[
-    {id:"s1",name:"Sol",x:0,y:0,z:0,f:"terran",icon:null,bodies:[
-      {id:"sun",type:"star",name:"Sun",o:null,resources:["energy"],fuel:"fusion",stations:[{id:"solsta",name:"Sol Station",o:"equatorial",resources:["fuel"]}]},
-      {id:"earth",type:"planet",name:"Earth",parent:"sun",o:"circular",resources:["water","food"],fuel:"antimatter",
-        locations:[{id:"ny",name:"New York",x:40,y:-74,type:"dayside"}],
-        stations:[{id:"iss",name:"Orbital Hub",o:"equatorial",resources:["cargo"]}]},
-      {id:"luna",type:"moon",name:"Luna",parent:"earth",o:"circular",resources:["metals"],stations:[{id:"lunasta",name:"Luna Base",o:"polar",resources:["ore"]}]}
-    ]},
-    {id:"s2",name:"Vega",x:25,y:-10,z:8,f:"terran",bodies:[{id:"vega",type:"star",name:"Vega",o:null,resources:["rare"],fuel:"antimatter"}]},
-    {id:"s3",name:"Altair",x:-20,y:18,z:-6,f:"traders",bodies:[]},
-    {id:"s4",name:"Rigel",x:10,y:30,z:14,f:"traders",bodies:[]},
-    {id:"s5",name:"Deneb",x:-30,y:-22,z:10,f:"none",bodies:[]},
-    {id:"s6",name:"Kepler",x:38,y:18,z:-8,f:"none",bodies:[]}
-  ],
-  gates:[["s1","s2",4],["s1","s3",6],["s2","s6",3],["s3","s4",5],["s1","s5",7],["s4","s6",4]],
-  lanes:[],
-  deals:[]
-};Economy.init(U, CFG);
-/* ======================================== */
-const $=s=>document.querySelector(s),css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),fcol=f=>(CFG.factions[f]||CFG.factions.none).color;
-let screen="map",selId=null,dirty=1;
-const cv=$("#cv"),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));
-const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,1,.1,1000),grp=new THREE.Group(),O={th:.8,ph:1,r:85};
-sc.add(grp);const grid=new THREE.GridHelper(100,20);sc.add(grid);
-const mp=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
-mp.rotation.x=-Math.PI/2;mp.position.y=-.05;sc.add(mp);
-if(CFG.mapImage)new THREE.TextureLoader().load(CFG.mapImage,t=>{mp.material.map=t;mp.material.opacity=.75;mp.material.needsUpdate=true;dirty=1});
-function setCam(){cam.position.set(O.r*Math.sin(O.ph)*Math.cos(O.th),O.r*Math.cos(O.ph),O.r*Math.sin(O.ph)*Math.sin(O.th));cam.lookAt(0,0,0);dirty=1}
-function resize(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=1}
-function label(t,col){const c=document.createElement("canvas");c.width=256;c.height=64;const x=c.getContext("2d");x.font="bold 30px system-ui";x.textAlign="center";x.fillStyle=col;x.fillText(t,128,42);
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(12,3,1);s.position.y=3;return s}
-function rebuild(){
-  grp.children.slice().forEach(o=>{grp.remove(o);o.geometry&&o.geometry.dispose();o.material&&(o.material.map&&o.material.map.dispose(),o.material.dispose())});
-  const fg=css("--fg"),mut=css("--mut"),ac=css("--ac");R.setClearColor(css("--bg"));
-  grid.material.color.set(mut);grid.material.opacity=.35;grid.material.transparent=true;
-  const P=s=>new THREE.Vector3(s.x,s.z,s.y),by=id=>U.systems.find(s=>s.id==id),gp=[],dp=[];
-  U.systems.forEach(s=>{
-    const m=new THREE.Mesh(new THREE.SphereGeometry(1.6,14,10),new THREE.MeshBasicMaterial({color:fcol(s.f)}));m.position.copy(P(s));m.userData.id=s.id;grp.add(m);
-    const l=label(s.name,fg);l.position.add(P(s));grp.add(l);
-    if(s.id==selId){const r=new THREE.Mesh(new THREE.SphereGeometry(2.3,12,8),new THREE.MeshBasicMaterial({color:ac,wireframe:true}));r.position.copy(P(s));grp.add(r)}
-    const p=P(s);dp.push(p.x,p.y,p.z,p.x,0,p.z)});
-  U.gates.forEach(g=>{const a=by(g[0]),b=by(g[1]);if(a&&b){const p=P(a),q=P(b);gp.push(p.x,p.y,p.z,q.x,q.y,q.z)}});
-  const ls=(arr,col,op)=>{const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(arr,3));grp.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op})))};
-  ls(dp,mut,.35);ls(gp,ac,1);dirty=1;renderUI();
+credits:10000,
+
+player:{
+vehicleId:"player_ship",
+location:"iss"
+},
+
+pilots:[],
+
+vehicles:[
+{
+id:"player_ship",
+name:"Starter Freighter",
+type:"freighter",
+capacity:20,
+mass:5000,
+speed:2,
+cost:0,
+engine:"ion",
+powerSource:"fusion",
+propellant:"xenon",
+propellantCapacity:500,
+propellantRemaining:500,
+thrust:250,
+power:800,
+efficiency:0.8,
+condition:100,
+maintenance:0
 }
-const ptr=new Map();let down=null,pd=0;
-const pinch=()=>{const a=[...ptr.values()];return Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])};
-cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);down={x:e.clientX,y:e.clientY,t:Date.now(),n:ptr.size};if(ptr.size==2)pd=pinch()});
-cv.addEventListener("pointermove",e=>{const p=ptr.get(e.pointerId);if(!p)return;
-  if(ptr.size==1){O.th-=(e.clientX-p[0])*.01;O.ph=Math.min(3,Math.max(.1,O.ph-(e.clientY-p[1])*.01))}
-  ptr.set(e.pointerId,[e.clientX,e.clientY]);
-  if(ptr.size==2){const d=pinch();O.r=Math.min(250,Math.max(15,O.r*pd/d));pd=d}setCam()});
-cv.addEventListener("pointerup",e=>{if(ptr.size==1&&down&&down.n==1&&Date.now()-down.t<400&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<8)tap(e);ptr.delete(e.pointerId)});
-cv.addEventListener("pointercancel",e=>ptr.delete(e.pointerId));
-cv.addEventListener("wheel",e=>{e.preventDefault();O.r=Math.min(250,Math.max(15,O.r*(1+e.deltaY*.001)));setCam()},{passive:false});
-const ray=new THREE.Raycaster();
-function tap(e){const r=cv.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),cam);
-  const h=ray.intersectObjects(grp.children.filter(o=>o.userData.id));
-  selId=h.length?h[0].object.userData.id:null;rebuild()}
-function bodyHtml(b){
-  const res=(b.resources||[]).join(", ")||"—";
-  const st=(b.stations||[]).map(s=>`<div style="margin:4px 0 4px 12px">${s.name} <small>(o: ${s.o||"none"}, res: ${(s.resources||[]).join(", ")||"—"}${s.fuel?", fuel: "+s.fuel:""})</small></div>`).join("");
-  const locs=(b.locations||[]).map(l=>`<div style="margin:2px 0 2px 20px;font-size:13.5px" class="mut">${l.name} @ (${l.x},${l.y}) <small>type: ${l.type||"—"}</small></div>`).join("");
-  return `<details open><summary>${b.name} <small>(${b.type}${b.o?", o: "+b.o:""}, res: ${res}${b.fuel?", fuel: "+b.fuel:""})</small></summary>${st}${locs}</details>`;
+],
+
+systems:[
+{
+id:"s1",name:"Sol",x:0,y:0,z:0,
+f:"terran",icon:null,
+bodies:[
+{
+id:"sun",type:"star",name:"Sun",
+o:null,resources:["energy"],fuel:"fusion",
+stations:[
+{id:"solsta",name:"Sol Station",o:"equatorial",resources:["fuel"]}
+]
+},
+{
+id:"earth",type:"planet",name:"Earth",
+parent:"sun",o:"circular",
+resources:["water","food"],
+fuel:"antimatter",
+locations:[
+{id:"ny",name:"New York",x:40,y:-74,type:"dayside"}
+],
+stations:[
+{id:"iss",name:"Orbital Hub",o:"equatorial",resources:["cargo"]}
+]
+},
+{
+id:"luna",type:"moon",name:"Luna",
+parent:"earth",o:"circular",
+resources:["metals"],
+stations:[
+{id:"lunasta",name:"Luna Base",o:"polar",resources:["ore"]}
+]
 }
-function renderUI(){
-  $("#cred").textContent=`Credits: ${U.credits}`;
-  const s=U.systems.find(x=>x.id==selId);
-  if(s){
-    const bodies=(s.bodies||[]).map(bodyHtml).join("");
-    const gtimes=U.gates.filter(g=>g.includes(s.id)).map(g=>{const o=g[0]==s.id?g[1]:g[0];const os=U.systems.find(x=>x.id==o);return os?`${os.name} (${g[2]}t)`:"";}).filter(Boolean).join(", ");
-    $("#sel").innerHTML=`<b>${s.name}</b> · ${CFG.factions[s.f]?.name||s.f}<br><small>pos ${s.x}, ${s.y}, ${s.z} · gates: ${gtimes||"none"}</small><div style="margin-top:8px">${bodies||"<div class='empty'>No bodies defined</div>"}</div>`;
-  }else $("#sel").innerHTML=`<div class="empty">${U.systems.length} systems · ${U.gates.length} gates</div>`;
-  $("#plist").innerHTML=U.pilots.map((p,i)=>`<div class="list-item"><span>${p.name}</span><button class="danger" data-rmp="${i}">Fire</button></div>`).join("")||`<div class="empty">No pilots hired yet</div>`;
-  $("#vtypes").innerHTML=CFG.vehicleTypes.map(t=>`<div class="list-item"><div><b>${t.name}</b><br><small>Capacity: ${t.capacity} · Mass: ${t.mass} · Engine: ${t.engine} · Power: ${t.powerSource} · Propellant: ${t.propellant}</small></div><button class="ok" data-buy="${t.id}">Buy ${t.cost} cr</button></div>`).join("");
-  $("#vlist").innerHTML=U.vehicles.map((v,i)=>`<div class="list-item"><span>${v.name} <small>(${v.type}) · Condition: ${v.condition}% · Propellant: ${v.propellantRemaining}/${v.propellantCapacity}</small></span><button class="danger" data-rmv="${i}">Sell</button></div>`).join("")||`<div class="empty">No vehicles in fleet</div>`;
-  const sysOpts=U.systems.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
-  const pOpts=U.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
-  const vOpts=U.vehicles.map(v=>`<option value="${v.id}">${v.name}</option>`).join("");
-  const resSet=new Set();U.systems.forEach(sy=>(sy.bodies||[]).forEach(b=>{(b.resources||[]).forEach(r=>resSet.add(r));(b.stations||[]).forEach(st=>(st.resources||[]).forEach(r=>resSet.add(r)))}));
-  const rOpts=[...resSet].map(r=>`<option>${r}</option>`).join("")||`<option>antimatter</option>`;
-  $("#laneform").innerHTML=`<div class="form"><select id="lf">${sysOpts}</select><span>→</span><select id="lt">${sysOpts}</select><select id="lr">${rOpts}</select><select id="lp" multiple size="3">${pOpts}</select><select id="lv" multiple size="3">${vOpts}</select><button class="primary" id="la">Assign Lane</button></div>`;
-  $("#lanelist").innerHTML=U.lanes.map((l,i)=>`<div class="list-item"><span>${name(l.from)} → ${name(l.to)} · ${l.resource} · ${l.pilots.length} pilot(s) / ${l.vehicles.length} vehicle(s)</span><button class="danger" data-rml="${i}">Remove</button></div>`).join("")||`<div class="empty">No lanes assigned</div>`;
-  $("#dealform").innerHTML=`<div class="form"><select id="df">${sysOpts}</select><span>→</span><select id="dt">${sysOpts}</select><select id="dr">${rOpts}</select><input id="dy" type="number" min="1" value="5" style="width:70px" placeholder="years"><input id="dp" type="number" min="0" value="100" style="width:80px" placeholder="price"><input id="dq" type="number" min="1" value="10" style="width:70px" placeholder="qty"><button class="primary" id="da">Strike Deal</button></div>`;
-  $("#deallist").innerHTML=U.deals.map((d,i)=>`<div class="list-item"><span>${name(d.from)} → ${name(d.to)} · ${d.resource} · ${d.years} years @ ${d.price} · ${d.qty}/yr</span><button class="danger" data-rmd="${i}">Remove</button></div>`).join("")||`<div class="empty">No future deals</div>`;
-  document.querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{U.pilots.splice(+b.dataset.rmp,1);renderUI()});
-  document.querySelectorAll("[data-rmv]").forEach(b=>b.onclick=()=>{U.vehicles.splice(+b.dataset.rmv,1);renderUI()});
-  document.querySelectorAll("[data-rml]").forEach(b=>b.onclick=()=>{U.lanes.splice(+b.dataset.rml,1);renderUI()});
-  document.querySelectorAll("[data-rmd]").forEach(b=>b.onclick=()=>{U.deals.splice(+b.dataset.rmd,1);renderUI()});
-  document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
-    const t=CFG.vehicleTypes.find(x=>x.id==b.dataset.buy);
-    if(t&&U.credits>=t.cost){U.credits-=t.cost;U.vehicles.push({...t,id:"v"+Date.now(),name:t.name+" #"+(U.vehicles.length+1),type:t.id,condition:100,propellantRemaining:t.propellantCapacity,maintenance:0});renderUI()}
-  });
-  $("#hire").onclick=()=>{const n=$("#pname").value.trim();if(n&&U.credits>=500){U.credits-=500;U.pilots.push({id:"p"+Date.now(),name:n});$("#pname").value="";renderUI()}};
-  $("#la").onclick=()=>{const from=$("#lf").value,to=$("#lt").value,resource=$("#lr").value,pilots=[...$("#lp").selectedOptions].map(o=>o.value),vehicles=[...$("#lv").selectedOptions].map(o=>o.value);
-    if(from&&to&&from!=to&&resource&&(pilots.length||vehicles.length)){U.lanes.push({from,to,resource,pilots,vehicles});renderUI()}};
-  $("#da").onclick=()=>{const from=$("#df").value,to=$("#dt").value,resource=$("#dr").value,years=+$("#dy").value||1,price=+$("#dp").value||0,qty=+$("#dq").value||1;
-    if(from&&to&&from!=to&&resource&&years>0){U.deals.push({from,to,resource,years,price,qty});renderUI()}};}
-Economy.start();
-function name(id){return U.systems.find(s=>s.id==id)?.name||id}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
-  screen=b.dataset.s;document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$("#"+screen).classList.add("on");
-  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x==b));
-  if(screen=="map")resize();
+]
+},
+{
+id:"s2",name:"Vega",x:25,y:-10,z:8,
+f:"terran",
+bodies:[
+{id:"vega",type:"star",name:"Vega",o:null,resources:["rare"],fuel:"antimatter"}
+]
+},
+{id:"s3",name:"Altair",x:-20,y:18,z:-6,f:"traders",bodies:[]},
+{id:"s4",name:"Rigel",x:10,y:30,z:14,f:"traders",bodies:[]},
+{id:"s5",name:"Deneb",x:-30,y:-22,z:10,f:"none",bodies:[]},
+{id:"s6",name:"Kepler",x:38,y:18,z:-8,f:"none",bodies:[]}
+],
+
+gates:[
+["s1","s2",4],
+["s1","s3",6],
+["s2","s6",3],
+["s3","s4",5],
+["s1","s5",7],
+["s4","s6",4]
+],
+
+lanes:[],
+deals:[]
+};
+
+/* ========================================
+   INITIALIZATION
+======================================== */
+
+const $=s=>document.querySelector(s);
+
+const css=v=>
+getComputedStyle(document.documentElement)
+.getPropertyValue(v).trim();
+
+const fcol=f=>
+(CFG.factions[f]||CFG.factions.none).color;
+
+if(!window.THREE){
+document.body.innerHTML=
+'<div class="error">Three.js could not load. Check your internet connection and reload the page.</div>';
+throw new Error("Three.js unavailable");
+}
+
+if(!window.Economy){
+document.body.innerHTML=
+'<div class="error">economy.js could not load. Check that the file exists and is accessible.</div>';
+throw new Error("Economy module unavailable");
+}
+
+if(typeof Economy.init!=="function" ||
+typeof Economy.start!=="function"){
+throw new Error("Economy module is missing required functions.");
+}
+
+Economy.init(U,CFG);
+
+/* ========================================
+   SAFE HTML
+======================================== */
+
+function escapeHTML(value){
+return String(value??"").replace(/[&<>"']/g,char=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+})[char]);
+}
+
+function selectedValues(select){
+return [...select.selectedOptions].map(o=>o.value);
+}
+
+function validNumber(value,min=0){
+const n=Number(value);
+return Number.isFinite(n)&&n>=min?n:null;
+}
+
+/* ========================================
+   THREE.JS MAP
+======================================== */
+
+let screen="map";
+let selId=null;
+let dirty=1;
+let destroyed=false;
+
+const cv=$("#cv");
+
+let R;
+
+try{
+R=new THREE.WebGLRenderer({
+canvas:cv,
+antialias:true,
+alpha:false
 });
-addEventListener("resize",resize);
-(function loop(){if(dirty){R.render(sc,cam);dirty=0}requestAnimationFrame(loop)})();
-resize();setCam();rebuild();
-</script></body></html>
+}catch(error){
+$("#map").innerHTML=
+'<div class="error">WebGL is unavailable in this browser or device.</div>';
+throw error;
+}
+
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+
+const sc=new THREE.Scene();
+
+const cam=new THREE.PerspectiveCamera(55,1,.1,1000);
+
+const grp=new THREE.Group();
+
+const O={
+th:.8,
+ph:1,
+r:85
+};
+
+sc.add(grp);
+
+const grid=new THREE.GridHelper(100,20);
+sc.add(grid);
+
+const mp=new THREE.Mesh(
+new THREE.PlaneGeometry(100,100),
+new THREE.MeshBasicMaterial({
+transparent:true,
+opacity:0,
+side:THREE.DoubleSide,
+depthWrite:false
+})
+);
+
+mp.rotation.x=-Math.PI/2;
+mp.position.y=-.05;
+sc.add(mp);
+
+if(CFG.mapImage){
+new THREE.TextureLoader().load(
+CFG.mapImage,
+t=>{
+mp.material.map=t;
+mp.material.opacity=.75;
+mp.material.needsUpdate=true;
+dirty=1;
+},
+undefined,
+error=>console.error("Map image failed to load:",error)
+);
+}
+
+function setCam(){
+cam.position.set(
+O.r*Math.sin(O.ph)*Math.cos(O.th),
+O.r*Math.cos(O.ph),
+O.r*Math.sin(O.ph)*Math.sin(O.th)
+);
+cam.lookAt(0,0,0);
+dirty=1;
+}
+
+function resize(){
+const w=cv.clientWidth;
+const h=cv.clientHeight;
+
+if(!w||!h)return;
+
+R.setSize(w,h,false);
+cam.aspect=w/h;
+cam.updateProjectionMatrix();
+dirty=1;
+}
+
+function label(t,col){
+const c=document.createElement("canvas");
+c.width=256;
+c.height=64;
+
+const x=c.getContext("2d");
+x.font="bold 30px system-ui";
+x.textAlign="center";
+x.fillStyle=col;
+x.fillText(String(t).slice(0,30),128,42);
+
+const texture=new THREE.CanvasTexture(c);
+
+const sprite=new THREE.Sprite(
+new THREE.SpriteMaterial({
+map:texture,
+depthTest:false,
+transparent:true
+})
+);
+
+sprite.scale.set(12,3,1);
+sprite.position.y=3;
+
+return sprite;
+}
+
+function rebuild(){
+while(grp.children.length){
+const obj=grp.children[0];
+grp.remove(obj);
+
+if(obj.geometry)obj.geometry.dispose();
+
+if(obj.material){
+if(obj.material.map)obj.material.map.dispose();
+obj.material.dispose();
+}
+}
+
+const fg=css("--fg");
+const mut=css("--mut");
+const ac=css("--ac");
+
+R.setClearColor(css("--bg"));
+
+grid.material.color.set(mut);
+grid.material.opacity=.35;
+grid.material.transparent=true;
+
+const P=s=>new THREE.Vector3(s.x,s.z,s.y);
+
+const by=id=>U.systems.find(s=>s.id===id);
+
+const gp=[];
+const dp=[];
+
+U.systems.forEach(s=>{
+const p=P(s);
+
+const m=new THREE.Mesh(
+new THREE.SphereGeometry(1.6,14,10),
+new THREE.MeshBasicMaterial({color:fcol(s.f)})
+);
+
+m.position.copy(p);
+m.userData.id=s.id;
+grp.add(m);
+
+const l=label(s.name,fg);
+l.position.copy(p);
+grp.add(l);
+
+if(s.id===selId){
+const ring=new THREE.Mesh(
+new THREE.SphereGeometry(2.3,12,8),
+new THREE.MeshBasicMaterial({
+color:ac,
+wireframe:true
+})
+);
+
+ring.position.copy(p);
+grp.add(ring);
+}
+
+dp.push(p.x,p.y,p.z,p.x,0,p.z);
+});
+
+U.gates.forEach(g=>{
+const a=by(g[0]);
+const b=by(g[1]);
+
+if(a&&b){
+const p=P(a);
+const q=P(b);
+
+gp.push(p.x,p.y,p.z,q.x,q.y,q.z);
+}
+});
+
+function lines(arr,col,opacity){
+if(!arr.length)return;
+
+const geometry=new THREE.BufferGeometry();
+
+geometry.setAttribute(
+"position",
+new THREE.Float32BufferAttribute(arr,3)
+);
+
+grp.add(new THREE.LineSegments(
+geometry,
+new THREE.LineBasicMaterial({
+color:col,
+transparent:true,
+opacity
+})
+));
+}
+
+lines(dp,mut,.35);
+lines(gp,ac,1);
+
+dirty=1;
+renderUI();
+}
+
+/* ========================================
+   POINTER CONTROLS
+======================================== */
+
+const ptr=new Map();
+
+let down=null;
+let pd=0;
+
+function pinch(){
+const a=[...ptr.values()];
+
+if(a.length<2)return 0;
+
+return Math.hypot(
+a[0][0]-a[1][0],
+a[0][1]-a[1][1]
+);
+}
+
+cv.addEventListener("pointerdown",e=>{
+cv.setPointerCapture(e.pointerId);
+
+ptr.set(e.pointerId,[e.clientX,e.clientY]);
+
+down={
+x:e.clientX,
+y:e.clientY,
+t:Date.now(),
+n:ptr.size
+};
+
+if(ptr.size===2)pd=pinch();
+});
+
+cv.addEventListener("pointermove",e=>{
+const p=ptr.get(e.pointerId);
+if(!p)return;
+
+if(ptr.size===1){
+O.th-=(e.clientX-p[0])*.01;
+
+O.ph=Math.min(
+3,
+Math.max(.1,O.ph-(e.clientY-p[1])*.01)
+);
+}
+
+ptr.set(e.pointerId,[e.clientX,e.clientY]);
+
+if(ptr.size===2){
+const d=pinch();
+
+if(pd>0&&d>0){
+O.r=Math.min(
+250,
+Math.max(15,O.r*pd/d)
+);
+}
+
+pd=d;
+}
+
+setCam();
+});
+
+function pointerEnd(e){
+const wasSingle=ptr.size===1;
+const currentDown=down;
+
+if(
+wasSingle&&
+currentDown&&
+currentDown.n===1&&
+Date.now()-currentDown.t<400&&
+Math.hypot(
+e.clientX-currentDown.x,
+e.clientY-currentDown.y
+)<8
+){
+tap(e);
+}
+
+ptr.delete(e.pointerId);
+
+if(ptr.size===0)down=null;
+if(ptr.size<2)pd=0;
+}
+
+cv.addEventListener("pointerup",pointerEnd);
+
+cv.addEventListener("pointercancel",e=>{
+ptr.delete(e.pointerId);
+if(ptr.size===0)down=null;
+pd=0;
+});
+
+cv.addEventListener("wheel",e=>{
+e.preventDefault();
+
+O.r=Math.min(
+250,
+Math.max(15,O.r*(1+e.deltaY*.001))
+);
+
+setCam();
+},{passive:false});
+
+const ray=new THREE.Raycaster();
+
+function tap(e){
+const rect=cv.getBoundingClientRect();
+
+ray.setFromCamera(
+new THREE.Vector2(
+((e.clientX-rect.left)/rect.width)*2-1,
+-((e.clientY-rect.top)/rect.height)*2+1
+),
+cam
+);
+
+const targets=grp.children.filter(
+o=>o.userData.id
+);
+
+const hits=ray.intersectObjects(targets);
+
+selId=hits.length
+?hits[0].object.userData.id
+:null;
+
+rebuild();
+}
+
+/* ========================================
+   BODY INFORMATION
+======================================== */
+
+function bodyHtml(b){
+const res=(b.resources||[])
+.map(escapeHTML).join(", ")||"—";
+
+const stations=(b.stations||[])
+.map(s=>`
+<div style="margin:4px 0 4px 12px">
+${escapeHTML(s.name)}
+<small>
+(o: ${escapeHTML(s.o||"none")},
+res: ${(s.resources||[]).map(escapeHTML).join(", ")||"—"}
+${s.fuel?", fuel: "+escapeHTML(s.fuel):""})
+</small>
+</div>
+`).join("");
+
+const locations=(b.locations||[])
+.map(l=>`
+<div style="margin:2px 0 2px 20px;font-size:13.5px" class="mut">
+${escapeHTML(l.name)}
+@ (${escapeHTML(l.x)},${escapeHTML(l.y)})
+<small>type: ${escapeHTML(l.type||"—")}</small>
+</div>
+`).join("");
+
+return `
+<details open>
+<summary>
+${escapeHTML(b.name)}
+<small>
+(${escapeHTML(b.type)}
+${b.o?", o: "+escapeHTML(b.o):""},
+res: ${res}
+${b.fuel?", fuel: "+escapeHTML(b.fuel):""})
+</small>
+</summary>
+${stations}${locations}
+</details>
+`;
+}
+
+/* ========================================
+   USER INTERFACE
+======================================== */
+
+function name(id){
+return escapeHTML(
+U.systems.find(s=>s.id===id)?.name||id
+);
+}
+
+function renderUI(){
+
+$("#cred").textContent=
+`Credits: ${Number(U.credits)||0}`;
+
+const s=U.systems.find(x=>x.id===selId);
+
+if(s){
+
+const bodies=(s.bodies||[])
+.map(bodyHtml).join("");
+
+const gtimes=U.gates
+.filter(g=>g.includes(s.id))
+.map(g=>{
+const other=g[0]===s.id?g[1]:g[0];
+
+const os=U.systems.find(x=>x.id===other);
+
+return os
+?`${escapeHTML(os.name)} (${escapeHTML(g[2])}t)`
+:"";
+})
+.filter(Boolean)
+.join(", ");
+
+$("#sel").innerHTML=`
+<b>${escapeHTML(s.name)}</b>
+· ${escapeHTML(CFG.factions[s.f]?.name||s.f)}
+<br>
+<small>
+pos ${escapeHTML(s.x)}, ${escapeHTML(s.y)}, ${escapeHTML(s.z)}
+· gates: ${gtimes||"none"}
+</small>
+<div style="margin-top:8px">
+${bodies||"<div class='empty'>No bodies defined</div>"}
+</div>
+`;
+
+}else{
+
+$("#sel").innerHTML=
+`<div class="empty">${U.systems.length} systems · ${U.gates.length} gates</div>`;
+}
+
+/* PILOTS */
+
+$("#plist").innerHTML=
+U.pilots.map((p,i)=>`
+<div class="list-item">
+<span>${escapeHTML(p.name)}</span>
+<button class="danger" data-rmp="${i}">Fire</button>
+</div>
+`).join("")||
+`<div class="empty">No pilots hired yet</div>`;
+
+/* VEHICLE TYPES */
+
+$("#vtypes").innerHTML=
+CFG.vehicleTypes.map(t=>`
+<div class="list-item">
+<div>
+<b>${escapeHTML(t.name)}</b>
+<br>
+<small>
+Capacity: ${escapeHTML(t.capacity)}
+· Mass: ${escapeHTML(t.mass)}
+· Engine: ${escapeHTML(t.engine)}
+· Power: ${escapeHTML(t.powerSource)}
+· Propellant: ${escapeHTML(t.propellant)}
+</small>
+</div>
+<button class="ok" data-buy="${escapeHTML(t.id)}">
+Buy ${escapeHTML(t.cost)} cr
+</button>
+</div>
+`).join("");
+
+/* FLEET */
+
+$("#vlist").innerHTML=
+U.vehicles.map((v,i)=>`
+<div class="list-item">
+<span>
+${escapeHTML(v.name)}
+<small>
+(${escapeHTML(v.type)})
+· Condition: ${escapeHTML(v.condition)}%
+· Propellant:
+${escapeHTML(v.propellantRemaining)}/${escapeHTML(v.propellantCapacity)}
+${v.id===U.player.vehicleId?" · ACTIVE":""}
+</small>
+</span>
+<button class="danger" data-rmv="${i}"
+${v.id===U.player.vehicleId?"disabled":""}>
+Sell
+</button>
+</div>
+`).join("")||
+`<div class="empty">No vehicles in fleet</div>`;
+
+/* SELECT OPTIONS */
+
+const sysOpts=U.systems.map(s=>
+`<option value="${escapeHTML(s.id)}">${escapeHTML(s.name)}</option>`
+).join("");
+
+const pOpts=U.pilots.map(p=>
+`<option value="${escapeHTML(p.id)}">${escapeHTML(p.name)}</option>`
+).join("");
+
+const vOpts=U.vehicles.map(v=>
+`<option value="${escapeHTML(v.id)}">${escapeHTML(v.name)}</option>`
+).join("");
+
+const resSet=new Set();
+
+U.systems.forEach(sy=>
+(sy.bodies||[]).forEach(b=>{
+(b.resources||[]).forEach(r=>resSet.add(r));
+
+(b.stations||[]).forEach(st=>
+(st.resources||[]).forEach(r=>resSet.add(r))
+);
+})
+);
+
+const rOpts=[...resSet].map(r=>
+`<option value="${escapeHTML(r)}">${escapeHTML(r)}</option>`
+).join("")||
+`<option value="antimatter">antimatter</option>`;
+
+/* LANE FORM */
+
+$("#laneform").innerHTML=`
+<div class="form">
+<select id="lf">${sysOpts}</select>
+<span>→</span>
+<select id="lt">${sysOpts}</select>
+<select id="lr">${rOpts}</select>
+<select id="lp" multiple size="3">${pOpts}</select>
+<select id="lv" multiple size="3">${vOpts}</select>
+<button class="primary" id="la">Assign Lane</button>
+</div>
+`;
+
+/* LANE LIST */
+
+$("#lanelist").innerHTML=
+U.lanes.map((l,i)=>`
+<div class="list-item">
+<span>
+${name(l.from)} → ${name(l.to)}
+· ${escapeHTML(l.resource)}
+· ${(l.pilots||[]).length} pilot(s)
+ / ${(l.vehicles||[]).length} vehicle(s)
+</span>
+<button class="danger" data-rml="${i}">Remove</button>
+</div>
+`).join("")||
+`<div class="empty">No lanes assigned</div>`;
+
+/* DEAL FORM */
+
+$("#dealform").innerHTML=`
+<div class="form">
+<select id="df">${sysOpts}</select>
+<span>→</span>
+<select id="dt">${sysOpts}</select>
+<select id="dr">${rOpts}</select>
+<input id="dy" type="number" min="1" value="5"
+style="width:70px" placeholder="years">
+<input id="dp" type="number" min="0" value="100"
+style="width:80px" placeholder="price">
+<input id="dq" type="number" min="1" value="10"
+style="width:70px" placeholder="qty">
+<button class="primary" id="da">Strike Deal</button>
+</div>
+`;
+
+/* DEAL LIST */
+
+$("#deallist").innerHTML=
+U.deals.map((d,i)=>`
+<div class="list-item">
+<span>
+${name(d.from)} → ${name(d.to)}
+· ${escapeHTML(d.resource)}
+· ${escapeHTML(d.years)} years
+@ ${escapeHTML(d.price)}
+· ${escapeHTML(d.qty)}/yr
+</span>
+<button class="danger" data-rmd="${i}">Remove</button>
+</div>
+`).join("")||
+`<div class="empty">No future deals</div>`;
+
+/* ========================================
+   PILOT REMOVAL
+======================================== */
+
+document.querySelectorAll("[data-rmp]").forEach(b=>{
+b.onclick=()=>{
+const index=Number(b.dataset.rmp);
+const pilot=U.pilots[index];
+
+if(!pilot)return;
+
+if(!confirm(`Fire ${pilot.name}?`))return;
+
+U.pilots.splice(index,1);
+
+U.lanesforEach(lane=>{
+lane.pilots=(lane.pilots||[])
+.filter(id=>id!==pilot.id);
+});
+
+renderUI();
+};
+});
+/* ========================================
+   VEHICLE REMOVAL
+======================================== */
+
+document.querySelectorAll("[data-rmv]").forEach(b=>{
+b.onclick=()=>{
+const index=Number(b.dataset.rmv);
+const vehicle=U.vehicles[index];
+
+if(!vehicle)return;
+
+if(vehicle.id===U.player.vehicleId){
+alert("You cannot sell your active player vehicle.");
+return;
+  }
+  if(!confirm(`Sell ${vehicle.name}?`))return;
+
+U.vehicles.splice(index,1);
+
+U.lanes.forEach(lane=>{
+lane.vehicles=(lane.vehicles||[])
+.filter(id=>id!==vehicle.id);
+});
+
+renderUI();
+};
+});
+/*=======================================
+   LANE REMOVAL
+========================================*/
+
+document.querySelectorAll("[data-rml]").forEach(b=>{
+b.onclick=()=>{
+const index=Number(b.dataset.rml);
+
+if(!U.lanes[index])return;
+
+U.lanes.splice(index,1);
+renderUI();
+};
+});
+/* ========================================
+   DEAL REMOVAL
+======================================== */
+
+document.querySelectorAll("[data-rmd]").forEach(b=>{
+b.onclick=()=>{
+const index=Number(b.dataset.rmd);
+
+if(!U.deals[index])return;
+
+U.deals.splice(index,1);
+renderUI();
+};
+});
+  /* ========================================
+   BUY VEHICLE
+======================================== */
+
+document.querySelectorAll("[data-buy]").forEach(b=>{
+b.onclick=()=>{
+const t=CFG.vehicleTypes.find(
+x=>x.id===b.dataset.buy
+);
+
+if(!t)return;
+
+if(U.credits<t.cost){
+alert("Not enough credits.");
+return;
+}
+
+if(!confirm(`Purchase ${t.name} for ${t.cost} credits?`)){
+return;
+  }
+  U.credits-=t.cost;
+
+U.vehicles.push({
+...t,
+id:"v"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
+name:t.name+" #"+(U.vehicles.length+1),
+type:t.id,
+condition:100,
+propellantRemaining:t.propellantCapacity,
+maintenance:0
+});
+
+renderUI();
+};
+});
+  
+
+  
+  
