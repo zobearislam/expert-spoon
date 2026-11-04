@@ -179,7 +179,7 @@ function renderUI(){
     $("#sel").innerHTML=`<b>${s.name}</b> · ${CFG.factions[s.f]?.name||s.f}<br><small>pos ${s.x}, ${s.y}, ${s.z} · gates: ${gtimes||"none"}</small><div style="margin-top:8px">${bodies||"<div class='empty'>No bodies defined</div>"}</div>`;
   }else $("#sel").innerHTML=`<div class="empty">${U.systems.length} systems · ${U.gates.length} gates</div>`;
   $("#plist").innerHTML=U.pilots.map((p,i)=>`<div class="list-item"><span>${p.name}</span><button class="danger" data-rmp="${i}">Fire</button></div>`).join("")||`<div class="empty">No pilots hired yet</div>`;
-  $("#vtypes").innerHTML=CFG.vehicleTypes.map(t=>`<div class="list-item"><div><b>${t.name}</b><br><small>cap ${t.capacity} · spd ${t.speed} · ${t.propellant}</small></div><button class="ok" data-buy="${t.id}">Buy ${t.cost} cr</button></div>`).join("");
+  $("#vtypes").innerHTML=CFG.vehicleTypes.map(t=>`<div class="list-item"><div><b>${t.name}</b><br><small>Capacity: ${t.capacity} · Mass: ${t.mass} · Engine: ${t.engine} · Power: ${t.powerSource} · Propellant: ${t.propellant}</small></div><button class="ok" data-buy="${t.id}">Buy ${t.cost} cr</button></div>`).join("");
   $("#vlist").innerHTML=U.vehicles.map((v,i)=>`<div class="list-item"><span>${v.name} <small>(${v.type})</small></span><button class="danger" data-rmv="${i}">Sell</button></div>`).join("")||`<div class="empty">No vehicles in fleet</div>`;
   const sysOpts=U.systems.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
   const pOpts=U.pilots.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
